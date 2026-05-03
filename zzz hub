@@ -1,4 +1,4 @@
--- CLEAN OLD GUI
+-- REMOVE OLD
 local player = game.Players.LocalPlayer
 local pg = player:WaitForChild("PlayerGui")
 
@@ -6,166 +6,123 @@ if pg:FindFirstChild("zzz_hub") then
 	pg.zzz_hub:Destroy()
 end
 
-print("GUI LOADED")
-
 -- SERVICES
 local UIS = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
 
 -- GUI
 local gui = Instance.new("ScreenGui", pg)
 gui.Name = "zzz_hub"
-gui.ResetOnSpawn = false
 
 -- COLORS
-local BG = Color3.fromRGB(8,8,12)
-local CARD = Color3.fromRGB(18,18,24)
+local BG = Color3.fromRGB(10,10,15)
+local CARD = Color3.fromRGB(20,20,25)
 local ACCENT = Color3.fromRGB(0,170,255)
 
--- MAIN FRAME
+-- MAIN
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 220, 0, 320)
+main.Size = UDim2.new(0, 230, 0, 300)
 main.Position = UDim2.new(0.1, 0, 0.2, 0)
 main.BackgroundColor3 = BG
-main.BorderSizePixel = 0
-Instance.new("UICorner", main).CornerRadius = UDim.new(0,10)
+main.Active = true
+main.Draggable = true -- ✅ FIX DRAG
 
--- TOP BAR
+Instance.new("UICorner", main)
+
+-- TITLE
 local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1,0,0,30)
 title.BackgroundTransparency = 1
 title.Text = "zzz hub"
 title.TextColor3 = ACCENT
 title.Font = Enum.Font.GothamBold
-title.TextSize = 16
-
--- DRAG SYSTEM
-local dragging = false
-local dragInput, dragStart, startPos
-
-title.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStart = input.Position
-		startPos = main.Position
-		
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
-	end
-end)
-
-title.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement then
-		dragInput = input
-	end
-end)
-
-UIS.InputChanged:Connect(function(input)
-	if input == dragInput and dragging then
-		local delta = input.Position - dragStart
-		main.Position = UDim2.new(
-			startPos.X.Scale,
-			startPos.X.Offset + delta.X,
-			startPos.Y.Scale,
-			startPos.Y.Offset + delta.Y
-		)
-	end
-end)
 
 -- LAYOUT
 local layout = Instance.new("UIListLayout", main)
 layout.Padding = UDim.new(0,5)
-layout.SortOrder = Enum.SortOrder.LayoutOrder
 
 -- SECTION
-local function section(text)
-	local l = Instance.new("TextLabel", main)
-	l.Size = UDim2.new(1,-10,0,18)
-	l.BackgroundTransparency = 1
-	l.Text = text
-	l.TextColor3 = ACCENT
-	l.Font = Enum.Font.GothamBold
-	l.TextSize = 11
-	l.TextXAlignment = Enum.TextXAlignment.Left
+local function section(txt)
+	local t = Instance.new("TextLabel", main)
+	t.Size = UDim2.new(1,0,0,20)
+	t.BackgroundTransparency = 1
+	t.Text = txt
+	t.TextColor3 = ACCENT
+	t.Font = Enum.Font.GothamBold
 end
 
--- TOGGLE
+-- TOGGLE (FIXED)
 local function toggle(name)
-	local frame = Instance.new("Frame", main)
-	frame.Size = UDim2.new(1,-10,0,26)
-	frame.BackgroundColor3 = CARD
-	frame.BorderSizePixel = 0
-	Instance.new("UICorner", frame).CornerRadius = UDim.new(0,6)
-
-	local text = Instance.new("TextLabel", frame)
-	text.Size = UDim2.new(0.65,0,1,0)
-	text.BackgroundTransparency = 1
-	text.Text = name
-	text.TextColor3 = Color3.fromRGB(255,255,255)
-	text.Font = Enum.Font.Gotham
-	text.TextSize = 11
-	text.TextXAlignment = Enum.TextXAlignment.Left
-
-	local btn = Instance.new("Frame", frame)
-	btn.Size = UDim2.new(0,36,0,16)
-	btn.Position = UDim2.new(1,-42,0.5,-8)
-	btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
-	Instance.new("UICorner", btn).CornerRadius = UDim.new(1,0)
-
-	local knob = Instance.new("Frame", btn)
-	knob.Size = UDim2.new(0,14,0,14)
-	knob.Position = UDim2.new(0,1,0.5,-7)
-	knob.BackgroundColor3 = Color3.fromRGB(255,255,255)
-	Instance.new("UICorner", knob).CornerRadius = UDim.new(1,0)
+	local btn = Instance.new("TextButton", main)
+	btn.Size = UDim2.new(1,-10,0,30)
+	btn.BackgroundColor3 = CARD
+	btn.Text = name .. " : OFF"
+	btn.TextColor3 = Color3.new(1,1,1)
+	btn.Font = Enum.Font.Gotham
 
 	local state = false
 
-	frame.InputBegan:Connect(function(input)
+	btn.MouseButton1Click:Connect(function()
+		state = not state
+		btn.Text = name .. " : " .. (state and "ON" or "OFF")
+		btn.BackgroundColor3 = state and ACCENT or CARD
+	end)
+end
+
+-- SLIDER (REAL)
+local function slider(name, min, max, start)
+	local frame = Instance.new("Frame", main)
+	frame.Size = UDim2.new(1,-10,0,40)
+	frame.BackgroundColor3 = CARD
+
+	local label = Instance.new("TextLabel", frame)
+	label.Size = UDim2.new(1,0,0,20)
+	label.BackgroundTransparency = 1
+	label.Text = name .. ": " .. start
+	label.TextColor3 = Color3.new(1,1,1)
+
+	local bar = Instance.new("Frame", frame)
+	bar.Size = UDim2.new(1,-10,0,10)
+	bar.Position = UDim2.new(0,5,0,25)
+	bar.BackgroundColor3 = Color3.fromRGB(50,50,50)
+
+	local fill = Instance.new("Frame", bar)
+	fill.Size = UDim2.new((start-min)/(max-min),0,1,0)
+	fill.BackgroundColor3 = ACCENT
+
+	local dragging = false
+
+	bar.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
-			state = not state
-			
-			TweenService:Create(btn, TweenInfo.new(0.2), {
-				BackgroundColor3 = state and ACCENT or Color3.fromRGB(50,50,50)
-			}):Play()
-			
-			TweenService:Create(knob, TweenInfo.new(0.2), {
-				Position = state and UDim2.new(1,-15,0.5,-7) or UDim2.new(0,1,0.5,-7)
-			}):Play()
+			dragging = true
+		end
+	end)
+
+	UIS.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			dragging = false
+		end
+	end)
+
+	UIS.InputChanged:Connect(function(input)
+		if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+			local pos = (input.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X
+			pos = math.clamp(pos,0,1)
+
+			fill.Size = UDim2.new(pos,0,1,0)
+
+			local val = math.floor(min + (max-min)*pos)
+			label.Text = name .. ": " .. val
 		end
 	end)
 end
 
--- SLIDER (DISPLAY ONLY)
-local function slider(name, value)
-	local f = Instance.new("Frame", main)
-	f.Size = UDim2.new(1,-10,0,28)
-	f.BackgroundColor3 = CARD
-	Instance.new("UICorner", f).CornerRadius = UDim.new(0,6)
-
-	local t = Instance.new("TextLabel", f)
-	t.Size = UDim2.new(1,0,1,0)
-	t.BackgroundTransparency = 1
-	t.Text = name.."  "..value
-	t.TextColor3 = Color3.fromRGB(255,255,255)
-	t.Font = Enum.Font.Gotham
-	t.TextSize = 11
-end
-
--- BUILD UI
+-- BUILD
 section("SPEED")
-slider("Normal Speed", 19)
-slider("Carry Speed", 29)
-toggle("Speed Toggle")
+slider("Speed", 10, 100, 20)
 
 section("COMBAT")
 toggle("Auto Batt")
 
 section("MECHANICS")
-toggle("Insta Grab")
 toggle("Infinite Jump")
-toggle("Anti Ragdoll")
 toggle("FPS Boost")
-toggle("Medusa Counter")
