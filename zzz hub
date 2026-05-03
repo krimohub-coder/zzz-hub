@@ -1,0 +1,118 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+
+gui.Name = "zzz_hub"
+gui.ResetOnSpawn = false
+
+-- COLORS
+local BG = Color3.fromRGB(10,10,15)
+local CARD = Color3.fromRGB(20,20,25)
+local ACCENT = Color3.fromRGB(0,170,255)
+
+-- MAIN
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0, 260, 0, 420)
+main.Position = UDim2.new(0.1, 0, 0.2, 0)
+main.BackgroundColor3 = BG
+main.BorderSizePixel = 0
+Instance.new("UICorner", main).CornerRadius = UDim.new(0,12)
+
+-- TITLE
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1,0,0,40)
+title.BackgroundTransparency = 1
+title.Text = "zzz hub"
+title.TextColor3 = ACCENT
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+
+-- LINE
+local line = Instance.new("Frame", main)
+line.Size = UDim2.new(1,0,0,2)
+line.Position = UDim2.new(0,0,0,40)
+line.BackgroundColor3 = ACCENT
+line.BorderSizePixel = 0
+
+-- LAYOUT
+local layout = Instance.new("UIListLayout", main)
+layout.Padding = UDim.new(0,6)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- SECTION
+local function createSection(text)
+    local label = Instance.new("TextLabel", main)
+    label.Size = UDim2.new(1,-10,0,20)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = ACCENT
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 12
+    label.TextXAlignment = Enum.TextXAlignment.Left
+end
+
+-- TOGGLE
+local function createToggle(name)
+    local frame = Instance.new("Frame", main)
+    frame.Size = UDim2.new(1,-10,0,30)
+    frame.BackgroundColor3 = CARD
+    frame.BorderSizePixel = 0
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0,8)
+
+    local text = Instance.new("TextLabel", frame)
+    text.Size = UDim2.new(0.7,0,1,0)
+    text.BackgroundTransparency = 1
+    text.Text = name
+    text.TextColor3 = Color3.fromRGB(255,255,255)
+    text.Font = Enum.Font.Gotham
+    text.TextSize = 12
+    text.TextXAlignment = Enum.TextXAlignment.Left
+
+    local button = Instance.new("TextButton", frame)
+    button.Size = UDim2.new(0,40,0,20)
+    button.Position = UDim2.new(1,-45,0.5,-10)
+    button.BackgroundColor3 = Color3.fromRGB(60,60,60)
+    button.Text = ""
+    Instance.new("UICorner", button).CornerRadius = UDim.new(1,0)
+
+    local enabled = false
+
+    button.MouseButton1Click:Connect(function()
+        enabled = not enabled
+        button.BackgroundColor3 = enabled and ACCENT or Color3.fromRGB(60,60,60)
+    end)
+end
+
+-- SLIDER (simple display)
+local function createSlider(name, value)
+    local frame = Instance.new("Frame", main)
+    frame.Size = UDim2.new(1,-10,0,40)
+    frame.BackgroundColor3 = CARD
+    frame.BorderSizePixel = 0
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0,8)
+
+    local text = Instance.new("TextLabel", frame)
+    text.Size = UDim2.new(1,0,1,0)
+    text.BackgroundTransparency = 1
+    text.Text = name.."  "..value
+    text.TextColor3 = Color3.fromRGB(255,255,255)
+    text.Font = Enum.Font.Gotham
+    text.TextSize = 12
+end
+
+-- BUILD
+
+createSection("SPEED")
+createSlider("Normal Speed", 19)
+createSlider("Carry Speed", 29)
+createToggle("Speed Toggle")
+
+createSection("COMBAT")
+createToggle("Auto Batt")
+
+createSection("MECHANICS")
+createToggle("Insta Grab")
+createToggle("Infinite Jump")
+createToggle("Anti Ragdoll")
+createToggle("FPS Boost")
+createToggle("Medusa Counter")
