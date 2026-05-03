@@ -1,30 +1,21 @@
--- REMOVE OLD
-local player = game.Players.LocalPlayer
-local pg = player:WaitForChild("PlayerGui")
-
-if pg:FindFirstChild("zzz_hub") then
-	pg.zzz_hub:Destroy()
+-- DELETE OLD
+for _,v in pairs(game.CoreGui:GetChildren()) do
+	if v.Name == "zzz_hub" then
+		v:Destroy()
+	end
 end
 
--- SERVICES
-local UIS = game:GetService("UserInputService")
-
 -- GUI
-local gui = Instance.new("ScreenGui", pg)
+local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "zzz_hub"
-
--- COLORS
-local BG = Color3.fromRGB(10,10,15)
-local CARD = Color3.fromRGB(20,20,25)
-local ACCENT = Color3.fromRGB(0,170,255)
 
 -- MAIN
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 230, 0, 300)
-main.Position = UDim2.new(0.1, 0, 0.2, 0)
-main.BackgroundColor3 = BG
+main.Size = UDim2.new(0, 230, 0, 260)
+main.Position = UDim2.new(0.5,-115,0.5,-130)
+main.BackgroundColor3 = Color3.fromRGB(15,15,20)
 main.Active = true
-main.Draggable = true -- ✅ FIX DRAG
+main.Draggable = true -- ✅ DRAG FIX
 
 Instance.new("UICorner", main)
 
@@ -33,96 +24,83 @@ local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1,0,0,30)
 title.BackgroundTransparency = 1
 title.Text = "zzz hub"
-title.TextColor3 = ACCENT
+title.TextColor3 = Color3.fromRGB(0,170,255)
 title.Font = Enum.Font.GothamBold
 
 -- LAYOUT
 local layout = Instance.new("UIListLayout", main)
 layout.Padding = UDim.new(0,5)
 
--- SECTION
-local function section(txt)
-	local t = Instance.new("TextLabel", main)
-	t.Size = UDim2.new(1,0,0,20)
-	t.BackgroundTransparency = 1
-	t.Text = txt
-	t.TextColor3 = ACCENT
-	t.Font = Enum.Font.GothamBold
-end
-
--- TOGGLE (FIXED)
-local function toggle(name)
+-- TOGGLE FUNCTION
+local function createToggle(name)
 	local btn = Instance.new("TextButton", main)
 	btn.Size = UDim2.new(1,-10,0,30)
-	btn.BackgroundColor3 = CARD
-	btn.Text = name .. " : OFF"
+	btn.BackgroundColor3 = Color3.fromRGB(25,25,30)
 	btn.TextColor3 = Color3.new(1,1,1)
 	btn.Font = Enum.Font.Gotham
+	btn.Text = name.." : OFF"
 
 	local state = false
 
 	btn.MouseButton1Click:Connect(function()
 		state = not state
-		btn.Text = name .. " : " .. (state and "ON" or "OFF")
-		btn.BackgroundColor3 = state and ACCENT or CARD
+		btn.Text = name.." : "..(state and "ON" or "OFF")
+		btn.BackgroundColor3 = state and Color3.fromRGB(0,170,255) or Color3.fromRGB(25,25,30)
 	end)
 end
 
--- SLIDER (REAL)
-local function slider(name, min, max, start)
+-- SLIDER FUNCTION (WORKING)
+local UIS = game:GetService("UserInputService")
+
+local function createSlider(name, min, max, start)
 	local frame = Instance.new("Frame", main)
 	frame.Size = UDim2.new(1,-10,0,40)
-	frame.BackgroundColor3 = CARD
+	frame.BackgroundColor3 = Color3.fromRGB(25,25,30)
 
 	local label = Instance.new("TextLabel", frame)
 	label.Size = UDim2.new(1,0,0,20)
 	label.BackgroundTransparency = 1
-	label.Text = name .. ": " .. start
+	label.Text = name..": "..start
 	label.TextColor3 = Color3.new(1,1,1)
 
 	local bar = Instance.new("Frame", frame)
 	bar.Size = UDim2.new(1,-10,0,10)
 	bar.Position = UDim2.new(0,5,0,25)
-	bar.BackgroundColor3 = Color3.fromRGB(50,50,50)
+	bar.BackgroundColor3 = Color3.fromRGB(60,60,60)
 
 	local fill = Instance.new("Frame", bar)
 	fill.Size = UDim2.new((start-min)/(max-min),0,1,0)
-	fill.BackgroundColor3 = ACCENT
+	fill.BackgroundColor3 = Color3.fromRGB(0,170,255)
 
 	local dragging = false
 
-	bar.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+	bar.InputBegan:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = true
 		end
 	end)
 
-	UIS.InputEnded:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+	UIS.InputEnded:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = false
 		end
 	end)
 
-	UIS.InputChanged:Connect(function(input)
-		if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-			local pos = (input.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X
+	UIS.InputChanged:Connect(function(i)
+		if dragging and i.UserInputType == Enum.UserInputType.MouseMovement then
+			local pos = (i.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X
 			pos = math.clamp(pos,0,1)
 
 			fill.Size = UDim2.new(pos,0,1,0)
 
 			local val = math.floor(min + (max-min)*pos)
-			label.Text = name .. ": " .. val
+			label.Text = name..": "..val
 		end
 	end)
 end
 
 -- BUILD
-section("SPEED")
-slider("Speed", 10, 100, 20)
-
-section("COMBAT")
-toggle("Auto Batt")
-
-section("MECHANICS")
-toggle("Infinite Jump")
-toggle("FPS Boost")
+createSlider("Speed", 10, 100, 20)
+createToggle("Auto Farm")
+createToggle("Infinite Jump")
+createToggle("FPS Boost")
