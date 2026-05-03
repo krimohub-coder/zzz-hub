@@ -1,10 +1,19 @@
-local Players = game:GetService("Players")
+-- CLEAN OLD GUI
+local player = game.Players.LocalPlayer
+local pg = player:WaitForChild("PlayerGui")
+
+if pg:FindFirstChild("zzz_hub") then
+	pg.zzz_hub:Destroy()
+end
+
+print("GUI LOADED")
+
+-- SERVICES
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
-local player = Players.LocalPlayer
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-
+-- GUI
+local gui = Instance.new("ScreenGui", pg)
 gui.Name = "zzz_hub"
 gui.ResetOnSpawn = false
 
@@ -13,7 +22,7 @@ local BG = Color3.fromRGB(8,8,12)
 local CARD = Color3.fromRGB(18,18,24)
 local ACCENT = Color3.fromRGB(0,170,255)
 
--- MAIN
+-- MAIN FRAME
 local main = Instance.new("Frame", gui)
 main.Size = UDim2.new(0, 220, 0, 320)
 main.Position = UDim2.new(0.1, 0, 0.2, 0)
@@ -21,13 +30,7 @@ main.BackgroundColor3 = BG
 main.BorderSizePixel = 0
 Instance.new("UICorner", main).CornerRadius = UDim.new(0,10)
 
--- GLOW LINE
-local glow = Instance.new("Frame", main)
-glow.Size = UDim2.new(1,0,0,2)
-glow.BackgroundColor3 = ACCENT
-glow.BorderSizePixel = 0
-
--- TITLE (DRAG AREA)
+-- TOP BAR
 local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1,0,0,30)
 title.BackgroundTransparency = 1
@@ -135,7 +138,7 @@ local function toggle(name)
 	end)
 end
 
--- SLIDER LABEL
+-- SLIDER (DISPLAY ONLY)
 local function slider(name, value)
 	local f = Instance.new("Frame", main)
 	f.Size = UDim2.new(1,-10,0,28)
