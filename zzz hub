@@ -5,72 +5,95 @@ for _,v in pairs(game.CoreGui:GetChildren()) do
 	end
 end
 
+local UIS = game:GetService("UserInputService")
+
 -- GUI
 local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "zzz_hub"
 
+-- COLORS
+local BG = Color3.fromRGB(12,12,16)
+local CARD = Color3.fromRGB(22,22,28)
+local ACCENT = Color3.fromRGB(0,170,255)
+
 -- MAIN
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 230, 0, 260)
-main.Position = UDim2.new(0.5,-115,0.5,-130)
-main.BackgroundColor3 = Color3.fromRGB(15,15,20)
+main.Size = UDim2.new(0, 240, 0, 360)
+main.Position = UDim2.new(0.5,-120,0.5,-180)
+main.BackgroundColor3 = BG
 main.Active = true
-main.Draggable = true -- ✅ DRAG FIX
-
+main.Draggable = true
 Instance.new("UICorner", main)
 
 -- TITLE
 local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1,0,0,30)
+title.Size = UDim2.new(1,0,0,35)
 title.BackgroundTransparency = 1
 title.Text = "zzz hub"
-title.TextColor3 = Color3.fromRGB(0,170,255)
+title.TextColor3 = ACCENT
 title.Font = Enum.Font.GothamBold
+title.TextSize = 16
 
 -- LAYOUT
 local layout = Instance.new("UIListLayout", main)
-layout.Padding = UDim.new(0,5)
+layout.Padding = UDim.new(0,6)
 
--- TOGGLE FUNCTION
-local function createToggle(name)
+-- SECTION
+local function section(txt)
+	local t = Instance.new("TextLabel", main)
+	t.Size = UDim2.new(1,-10,0,18)
+	t.BackgroundTransparency = 1
+	t.Text = txt
+	t.TextColor3 = ACCENT
+	t.Font = Enum.Font.GothamBold
+	t.TextSize = 12
+	t.TextXAlignment = Enum.TextXAlignment.Left
+end
+
+-- TOGGLE
+local function toggle(name)
 	local btn = Instance.new("TextButton", main)
-	btn.Size = UDim2.new(1,-10,0,30)
-	btn.BackgroundColor3 = Color3.fromRGB(25,25,30)
+	btn.Size = UDim2.new(1,-10,0,28)
+	btn.BackgroundColor3 = CARD
 	btn.TextColor3 = Color3.new(1,1,1)
 	btn.Font = Enum.Font.Gotham
 	btn.Text = name.." : OFF"
+	Instance.new("UICorner", btn)
 
 	local state = false
 
 	btn.MouseButton1Click:Connect(function()
 		state = not state
 		btn.Text = name.." : "..(state and "ON" or "OFF")
-		btn.BackgroundColor3 = state and Color3.fromRGB(0,170,255) or Color3.fromRGB(25,25,30)
+		btn.BackgroundColor3 = state and ACCENT or CARD
 	end)
 end
 
--- SLIDER FUNCTION (WORKING)
-local UIS = game:GetService("UserInputService")
-
-local function createSlider(name, min, max, start)
+-- SLIDER
+local function slider(name, min, max, start)
 	local frame = Instance.new("Frame", main)
-	frame.Size = UDim2.new(1,-10,0,40)
-	frame.BackgroundColor3 = Color3.fromRGB(25,25,30)
+	frame.Size = UDim2.new(1,-10,0,45)
+	frame.BackgroundColor3 = CARD
+	Instance.new("UICorner", frame)
 
 	local label = Instance.new("TextLabel", frame)
 	label.Size = UDim2.new(1,0,0,20)
 	label.BackgroundTransparency = 1
-	label.Text = name..": "..start
+	label.Text = name.." : "..start
 	label.TextColor3 = Color3.new(1,1,1)
+	label.Font = Enum.Font.Gotham
+	label.TextSize = 12
 
 	local bar = Instance.new("Frame", frame)
 	bar.Size = UDim2.new(1,-10,0,10)
-	bar.Position = UDim2.new(0,5,0,25)
-	bar.BackgroundColor3 = Color3.fromRGB(60,60,60)
+	bar.Position = UDim2.new(0,5,0,28)
+	bar.BackgroundColor3 = Color3.fromRGB(50,50,50)
+	Instance.new("UICorner", bar)
 
 	local fill = Instance.new("Frame", bar)
 	fill.Size = UDim2.new((start-min)/(max-min),0,1,0)
-	fill.BackgroundColor3 = Color3.fromRGB(0,170,255)
+	fill.BackgroundColor3 = ACCENT
+	Instance.new("UICorner", fill)
 
 	local dragging = false
 
@@ -94,13 +117,23 @@ local function createSlider(name, min, max, start)
 			fill.Size = UDim2.new(pos,0,1,0)
 
 			local val = math.floor(min + (max-min)*pos)
-			label.Text = name..": "..val
+			label.Text = name.." : "..val
 		end
 	end)
 end
 
--- BUILD
-createSlider("Speed", 10, 100, 20)
-createToggle("Auto Farm")
-createToggle("Infinite Jump")
-createToggle("FPS Boost")
+-- BUILD (wie dein Bild)
+section("SPEED")
+slider("Normal Speed", 10, 50, 19)
+slider("Carry Speed", 10, 60, 29)
+toggle("Speed Toggle")
+
+section("COMBAT")
+toggle("Auto Batt")
+
+section("MECHANICS")
+toggle("Insta Grab")
+toggle("Infinite Jump")
+toggle("Anti Ragdoll")
+toggle("FPS Boost")
+toggle("Medusa Counter")
